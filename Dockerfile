@@ -1,15 +1,19 @@
-FROM debian:stable
+# use the OSF minideb for multi-arch images 
+FROM opensourcefoundries/minideb:stretch
 
 MAINTAINER Alan Bennett <alan.bennett@linaro.org>
 LABEL Version="0.1" Description="Container for compiling documents"
 
-#install dependencies for sphinx, pip and git (from where to fetch code from)
-RUN apt-get update && apt-get install -y python-pip python-sphinx latexdiff \
+#install dependencies for sphinx, pip and git
+RUN install_packages build-essential latexdiff \
+    python3-pip python3-sphinx python3-markupsafe \
     texlive texlive-latex-extra texlive-humanities \
     texlive-generic-recommended graphviz git
-RUN rm -rf /var/lib/apt-lists/*
 
-RUN pip install --user --upgrade Sphinx
+RUN pip3 install wheel \
+    && pip3 install setuptools \
+    && pip3 install --user --upgrade Sphinx \
+    && pip3 install sphinx_rtd_theme
 
 #if you don't pass in a REPO variable, just run bash, else build, copy and exit
 CMD mkdir -p /root/output/sphinx-build && \
